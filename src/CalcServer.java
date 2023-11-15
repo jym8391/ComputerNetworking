@@ -5,7 +5,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CalcServer {
-    private static final String ERROR_PREFIX = "ERROR: ";
+    private static final String ERROR_PREFIX = "ERR: ";
+    private static final String ANS = "ANS: ";
 
     public static String processRequest(String request) {
         // 요청 프로토콜을 처리하고 응답을 반환하는 메서드
@@ -20,14 +21,14 @@ public class CalcServer {
 
             switch (opcode) {
                 case "ADD":
-                    return Integer.toString(op1 + op2);
+                    return ANS+Integer.toString(op1 + op2);
                 case "SUB":
-                    return Integer.toString(op1 - op2);
+                    return ANS+Integer.toString(op1 - op2);
                 case "MUL":
-                    return Integer.toString(op1 * op2);
+                    return ANS+Integer.toString(op1 * op2);
                 case "DIV":
                     if (op2 != 0) {
-                        return Double.toString((double) op1 / op2);
+                        return ANS+Double.toString((double) op1 / op2);
                     } else {
                         return ERROR_PREFIX + "Division by zero";
                     }
@@ -99,15 +100,16 @@ public class CalcServer {
     
         @Override
         public void run() {
+            BufferedReader inFromClient = null;
+            DataOutputStream outToClient = null;
             System.out.println(socket+"연결되었습니다.");
             try {
-                BufferedReader in = new BufferedReader(
+                inFromClient = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
-                BufferedWriter out = new BufferedWriter(
-                        new OutputStreamWriter(socket.getOutputStream()));
+                outToClient = new DataOutputStream(socket.getOutputStream());
     
                 while (true) {
-                    String request = in.readLine();
+                    String request = inFromClient.readLine();
                     if (request == null || request.equalsIgnoreCase("bye")) {
                         System.out.println("클라이언트에서 연결을 종료하였음");
                         break; // 연결 종료
@@ -118,9 +120,9 @@ public class CalcServer {
                     // 요청을 처리하고 응답 생성
                     String response = processRequest(request);
     
-                    // 응답을 클라이언트에게 전송
-                    out.write(response + "\n");
-                    out.flush();
+                    // 응답(결과,에러)을 클라이언트에게 전송
+
+                    outToClient.writeBytes(response + "\n");
                 }
             } catch (IOException e) {
                 System.out.println("클라이언트와 통신 중 오류가 발생했습니다.");
