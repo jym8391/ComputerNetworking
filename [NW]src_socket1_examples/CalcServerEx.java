@@ -12,19 +12,30 @@ public class CalcServerEx {
         int op1 = Integer.parseInt(st.nextToken());
         String opcode = st.nextToken();
         int op2 = Integer.parseInt(st.nextToken());
-        switch (opcode) {
-            case "+":
-                res = Integer.toString(op1 + op2);
-                break;
-            case "-":
-                res = Integer.toString(op1 - op2);
-                break;
-            case "*":
-                res = Integer.toString(op1 * op2);
-                break;
-            default:
-                res = "error";
+        try {
+            switch (opcode) {
+                case "+":
+                    res = Integer.toString(op1 + op2);
+                    break;
+                case "-":
+                    res = Integer.toString(op1 - op2);
+                    break;
+                case "*":
+                    res = Integer.toString(op1 * op2);
+                    break;
+                case "/":
+                    res = Double.toString((double) op1 / op2);
+                    break;
+                default:
+                    res = "error : unsupported operator";
+            }
+        } catch (NumberFormatException e) {
+            res = "error: division by zero";
         }
+        catch (Exception e) {
+            res = "error";
+        }
+
         return res;
     }
 
