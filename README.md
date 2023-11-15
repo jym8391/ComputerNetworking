@@ -7,6 +7,7 @@
 
 
 # Protocol  
-OPERATION operand1 operand2
-OPERATION 종류 : ADD, SUB, MUL DIV
-Ex) ADD 1 2
+OPERATION operand1 operand2  
+OPERATION 종류 : ADD, SUB, MUL DIV  
+Ex) ADD 1 2  
+
