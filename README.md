@@ -11,7 +11,12 @@
 
 
 # Protocol  
-OPERATION operand1 operand2  
-OPERATION 종류 : ADD, SUB, MUL DIV  
+Request Protocol  
+OPERATION operand1 operand2  (OPERATION 종류 : ADD, SUB, MUL DIV)  
 Ex) ADD 1 2  
+유효하지 않은 요청, 잘못된 연산자, DIV에서 0으로 나눌 때의 경우 “ERR:” + meaning 반환  
+정상적인 입력의 경우 “ANS” +result반환    
 
+Response Protocol  
+displayResponse(serverResponse)   
+Response가 ANS, ERR, 그 이외일 때를 구분하여 result, error, 예외 메세지 출력  
