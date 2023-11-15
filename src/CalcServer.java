@@ -1,14 +1,17 @@
 import java.io.*;
 import java.net.*;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CalcServer {
+    private static final String ERROR_PREFIX = "ERROR: ";
 
     public static String processRequest(String request) {
         // 요청 프로토콜을 처리하고 응답을 반환하는 메서드
         String[] tokens = request.split(" ");
         if (tokens.length != 3)
-            return "error: invalid request";
+            return ERROR_PREFIX + "Invalid request";
 
         try {
             int op1 = Integer.parseInt(tokens[1]);
@@ -26,18 +29,17 @@ public class CalcServer {
                     if (op2 != 0) {
                         return Double.toString((double) op1 / op2);
                     } else {
-                        return "error: division by zero";
+                        return ERROR_PREFIX + "Division by zero";
                     }
                 default:
-                    return "error: unsupported operation";
+                    return ERROR_PREFIX + "Unsupported operation";
             }
         } catch (NumberFormatException e) {
-            return "error: invalid operand";
+            return ERROR_PREFIX + "Invalid operand";
         }
     }
 
     public static void main(String[] args) {
-
         ServerSocket listener = null;
 
         try {
@@ -52,12 +54,15 @@ public class CalcServer {
             listener = new ServerSocket(serverPort, 50, InetAddress.getByName(serverIp));
             System.out.println("연결을 기다리고 있습니다.....");
 
+            // Threadpool 생성
+            ExecutorService executorService = Executors.newFixedThreadPool(10); // 적절한 스레드 수를 설정
+
             while (true) {
                 Socket socket = listener.accept(); // 클라이언트로부터 연결 요청 대기
                 System.out.println("연결되었습니다.");
 
                 // 클라이언트 처리를 위한 스레드 시작
-                new ServerThread(socket).start();
+                executorService.submit(new ServerThread(socket));
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -87,13 +92,13 @@ public class CalcServer {
     }
 
     // 각 클라이언트 처리를 위한 스레드 클래스
-    private static class ServerThread extends Thread {
+    private static class ServerThread implements Runnable {
         private Socket socket;
-
+    
         public ServerThread(Socket socket) {
             this.socket = socket;
         }
-
+    
         @Override
         public void run() {
             try {
@@ -101,19 +106,19 @@ public class CalcServer {
                         new InputStreamReader(socket.getInputStream()));
                 BufferedWriter out = new BufferedWriter(
                         new OutputStreamWriter(socket.getOutputStream()));
-
+    
                 while (true) {
                     String request = in.readLine();
                     if (request == null || request.equalsIgnoreCase("bye")) {
                         System.out.println("클라이언트에서 연결을 종료하였음");
                         break; // 연결 종료
                     }
-
-                    System.out.println("Received request: " + request);
-
+    
+                    System.out.println("Thread " + Thread.currentThread().getName() + " received request: " + request);
+    
                     // 요청을 처리하고 응답 생성
                     String response = processRequest(request);
-
+    
                     // 응답을 클라이언트에게 전송
                     out.write(response + "\n");
                     out.flush();
