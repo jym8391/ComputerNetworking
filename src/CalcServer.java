@@ -59,8 +59,6 @@ public class CalcServer {
 
             while (true) {
                 Socket socket = listener.accept(); // 클라이언트로부터 연결 요청 대기
-                System.out.println("연결되었습니다.");
-
                 // 클라이언트 처리를 위한 스레드 시작
                 executorService.submit(new ServerThread(socket));
             }
@@ -101,6 +99,7 @@ public class CalcServer {
     
         @Override
         public void run() {
+            System.out.println(socket+"연결되었습니다.");
             try {
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
@@ -132,6 +131,7 @@ public class CalcServer {
                 } catch (IOException e) {
                     System.out.println("클라이언트 소켓 닫기 중 오류가 발생했습니다.");
                 }
+                System.out.println(socket + " 소켓을 닫았습니다.");
             }
         }
     }
