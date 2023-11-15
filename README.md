@@ -1,3 +1,7 @@
+#개요  
+프로토콜(텍스트)을 이용한 클라이언트-서버 request, response로 사칙연산 계산  
+
+
 # Requirment
 < 요구조건 #1: 사칙연산 수행: addition, subtraction, multiplication, division >  
 < 요구조건 #2: 프로토콜을 이용하여 request,response를 주고받음. >  
